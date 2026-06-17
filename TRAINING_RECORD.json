@@ -1,0 +1,29 @@
+{
+  "project": "FlowIE C4D Grayscale Training",
+  "location": "c:/code/diffusion-re/FlowIE_c4d",
+  "base_model": "weights/FlowIE_bsr_v1.pth",
+  "training_data": "C:/code/diffusion-re/C4DataSet_flowie/train",
+  "config": "configs/train_c4d.yaml",
+  "model_config": "configs/model/cldm_bsr_eval.yaml",
+  "batch_size": 2,
+  "accumulate_grad_batches": 4,
+  "max_steps": 50000,
+  "completed_steps": 32,
+  "loss_at_stop": "~1.81 (initial increase as model adapts to grayscale data)",
+  "output_dir": "work_dirs/c4d_train_grayscale",
+  "modified_files": [
+    "dataset/c4d_dataset.py (grayscale conversion)",
+    "model/cldm_bsr.py (apply_condition_encoder - use VAE encode directly)",
+    "model/callbacks.py (on_train_batch_end dataloader_idx default)",
+    "ldm/models/diffusion/ddpm.py (on_train_batch_start dataloader_idx default)",
+    "ldm/modules/encoders/modules.py (FrozenOpenCLIPEmbedder - use null embedding)",
+    "configs/model/cldm_bsr_eval.yaml (use_fp16=False)",
+    "configs/dataset/c4d_train.yaml",
+    "configs/dataset/c4d_val.yaml",
+    "configs/train_c4d.yaml"
+  ],
+  "resume_command": "export HF_ENDPOINT=https://hf-mirror.com && cd /c/code/diffusion-re/FlowIE_c4d && /c/ProgramData/anaconda3/python.exe -c \"import os; os.environ[\"HF_ENDPOINT\"] = \"https://hf-mirror.com\"; import sys; sys.path.insert(0, \".\"); import torch, pytorch_lightning as pl; from omegaconf import OmegaConf; from utils.common import instantiate_from_config, load_state_dict; config = OmegaConf.load(\"./configs/train_c4d.yaml\"); pl.seed_everything(config.lightning.seed, workers=True); data_module = instantiate_from_config(config.data); model_config = OmegaConf.load(config.model.config); model_config.params.first_stage_config.use_fp16 = False; model = instantiate_from_config(model_config); weights = torch.load(config.model.resume, map_location=\"cpu\"); load_state_dict(model, weights, strict=False); trainer_config = dict(config.lightning.trainer); trainer_config[\"devices\"] = [0]; trainer_config[\"default_root_dir\"] = \"./work_dirs/c4d_train_grayscale\"; trainer_config[\"num_sanity_val_steps\"] = 0; callbacks = [instantiate_from_config(cb) for cb in config.lightning.callbacks]; trainer = pl.Trainer(callbacks=callbacks, **trainer_config); trainer.fit(model, datamodule=data_module); print(\"Training complete!\")\"",
+  "notes": "Training ran ~5 steps. No checkpoint saved (first save at step 5000). Resume from original BSR checkpoint. All training data converted to grayscale (R=G=B averaged from C1-C3).",
+  "time_per_step": "~30s (batch=2, accumulate=4, effective batch=8)",
+  "total_time": "~16 minutes"
+}

@@ -1,0 +1,57 @@
+# Python
+
+**pycache**/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+
+venv/
+env/
+.venv/
+
+# IDE
+
+.vscode/
+.idea/
+
+# Logs
+
+*.log
+
+# Dataset
+
+data/
+dataset/
+datasets/
+
+# Training Results
+
+outputs/
+results/
+runs/
+logs/
+
+# Weights
+
+weights/
+checkpoints/
+
+# Large Model Files
+
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.engine
+
+# Cache
+
+.cache/
+torch_cache/
+
+# System
+
+.DS_Store
+Thumbs.db
