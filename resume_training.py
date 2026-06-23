@@ -42,7 +42,15 @@ callbacks = []
 for cb_config in config.lightning.callbacks:
     callbacks.append(instantiate_from_config(cb_config))
 
-trainer = pl.Trainer(callbacks=callbacks, **trainer_config)
+logger = None
+if config.lightning.get('logger'):
+    logger_config = OmegaConf.to_container(config.lightning.logger, resolve=True)
+    logger_params = dict(logger_config.get('params', {}))
+    if 'save_dir' not in logger_params:
+        logger_params['save_dir'] = trainer_config['default_root_dir']
+    logger = instantiate_from_config({**logger_config, 'params': logger_params})
+
+trainer = pl.Trainer(callbacks=callbacks, logger=logger, **trainer_config)
 
 print("=" * 60)
 print("Starting/Resuming GRAYSCALE training on C4D dataset")
@@ -50,6 +58,8 @@ print(f"Steps: {trainer_config.get('max_steps', 'N/A')}, "
       f"Batch: {config.data.params.train_config.data_loader.batch_size}, "
       f"Accumulate: {trainer_config.get('accumulate_grad_batches', 1)}")
 print(f"Output: {trainer_config['default_root_dir']}")
+if logger is not None:
+    print(f"TensorBoard: tensorboard --logdir {logger.log_dir}")
 print("=" * 60)
 
 trainer.fit(model, datamodule=data_module)

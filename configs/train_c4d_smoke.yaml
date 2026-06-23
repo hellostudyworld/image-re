@@ -15,29 +15,30 @@ lightning:
     accelerator: auto
     precision: 32
     devices: [0]
-    default_root_dir: ./work_dirs/c4d_train_grayscale
-    max_steps: 50000
-    val_check_interval: 400
-    log_every_n_steps: 50
-    accumulate_grad_batches: 4
-    check_val_every_n_epoch: 1
+    default_root_dir: ./work_dirs/c4d_smoke_test
+    max_steps: 12
+    val_check_interval: 100
+    limit_val_batches: 0
+    log_every_n_steps: 2
+    accumulate_grad_batches: 1
+    num_sanity_val_steps: 0
 
   logger:
     target: pytorch_lightning.loggers.TensorBoardLogger
     params:
-      save_dir: ./work_dirs/c4d_train_grayscale
+      save_dir: ./work_dirs/c4d_smoke_test
       name: tensorboard
       default_hp_metric: false
 
   callbacks:
     - target: model.callbacks.ImageLogger
       params:
-        log_every_n_steps: 250
-        max_images_each_step: 4
+        log_every_n_steps: 10
+        max_images_each_step: 2
         log_images_kwargs: ~
 
     - target: model.callbacks.ModelCheckpoint
       params:
-        every_n_train_steps: 5000
+        every_n_train_steps: 10
         save_top_k: -1
-        filename: {step}
+        filename: step-{step}

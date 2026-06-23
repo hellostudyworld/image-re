@@ -35,7 +35,12 @@ def main() -> None:
     callbacks = []
     for callback_config in config.lightning.callbacks:
         callbacks.append(instantiate_from_config(callback_config))
-    trainer = pl.Trainer(callbacks=callbacks, **config.lightning.trainer)
+
+    logger = None
+    if config.lightning.get("logger"):
+        logger = instantiate_from_config(config.lightning.logger)
+
+    trainer = pl.Trainer(callbacks=callbacks, logger=logger, **config.lightning.trainer)
     trainer.fit(model, datamodule=data_module)
     #trainer.test()
 

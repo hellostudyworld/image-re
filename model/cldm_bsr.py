@@ -641,9 +641,23 @@ class Reflow_ControlLDM(LatentDiffusion):
         #print(v.shape)
       
         log_prefix = 'train' if self.training else 'val'
-        losses.update({f'{log_prefix}/loss':loss_mse,f'{log_prefix}/loss_MSE':loss_mse})
+        losses.update({f'{log_prefix}/loss': loss_mse, f'{log_prefix}/loss_mse': loss_mse})
 
-        self.log(f'{log_prefix}/loss_lpips',loss_mse,logger=True)
+        self.log(
+            f'{log_prefix}/loss',
+            loss_mse,
+            prog_bar=True,
+            logger=True,
+            on_step=True,
+            on_epoch=True,
+        )
+        self.log(
+            f'{log_prefix}/loss_mse',
+            loss_mse,
+            logger=True,
+            on_step=True,
+            on_epoch=True,
+        )
         return loss_mse
 
     @torch.no_grad()

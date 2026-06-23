@@ -32,6 +32,11 @@ outputs/
 results/
 runs/
 logs/
+work_dirs/
+lightning_logs/
+image_log/
+inference_results/
+infer_input/
 
 # Weights
 
